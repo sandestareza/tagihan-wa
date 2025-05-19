@@ -129,6 +129,12 @@ function App() {
 		);
 	};
 
+  const handleReset = () => {
+    setForm(defaultForm);
+    setSelectedMonths([]);
+    setMessage('');
+  };
+
 	const lastFive = getLastFiveDaysOfCurrentMonth();
 
 	return (
@@ -287,9 +293,17 @@ function App() {
 						<Button
 							type="submit"
 							variant="outline"
-							className="mt-5 w-full"
+							className="mt-5 w-full bg-black text-white"
 						>
 							Generate
+						</Button>
+						<Button
+							type="reset"
+							variant="outline"
+							className="mt-5 w-full"
+              onClick={handleReset}
+						>
+							Reset Form
 						</Button>
 					</form>
 				</CardContent>
@@ -313,7 +327,7 @@ function App() {
 									</p>
 								</CardDescription>
 								<Button
-									className="w-full"
+									className=" mt-5 w-full bg-black text-white"
 									variant="outline"
 									onClick={handleKirim}
 								>
