@@ -33,6 +33,7 @@ function App() {
 	const [form, setForm] = useState(defaultForm);
 
 	const [message, setMessage] = useState("");
+	const [isCopy, setIsCopy] = useState(false);
 
 	const months = [
 		"Januari",
@@ -67,7 +68,7 @@ function App() {
 		const lastDay = new Date(year, month + 1, 0).getDate();
 
 		const lastFiveDays: string[] = [];
-		for (let i = 4; i >= 0; i--) {
+		for (let i = 5; i >= 0; i--) {
 			const date = new Date(year, month, lastDay - i);
 			lastFiveDays.push(formatDateIndo(date.toString()));
 		}
@@ -94,7 +95,7 @@ function App() {
 		tglTerakhirLunas: string;
 	}) => {
 		setMessage(`Assalamu’alaikum Warahmatullahi Wabarakatuh\n\nYang kami hormati,\n*Wali Santri ${
-			form.namaSantri
+			toTitleCase(form.namaSantri)
 		}* yang dirahmati Allah Subhanahu wa Ta’ala.\n\nSemoga Bapak/Ibu senantiasa dalam keadaan sehat wal‘afiat serta selalu berada dalam lindungan dan keberkahan Allah Subhanahu wa Ta’ala.\n\nSehubungan dengan kelancaran proses pembelajaran di Rumah Tahfidz Azzam, bersama ini kami sampaikan informasi terkait administrasi pembayaran SPP.\nKami informasikan bahwa masih terdapat sisa pembayaran SPP bulan *${selectedMonths.join(
 			", "
 		)}* sebesar *${
@@ -124,18 +125,37 @@ function App() {
 	const handleKirim = () => {
 		const encodedMessage = encodeURIComponent(message);
 		window.open(
-			`https://api.whatsapp.com/send?phone=${form.noWa}&text=${encodedMessage}`,
+			`https://api.whatsapp.com/send?text=${encodedMessage}`,
 			"_blank"
 		);
 	};
 
-  const handleReset = () => {
-    setForm(defaultForm);
-    setSelectedMonths([]);
-    setMessage('');
-  };
+	const handleReset = () => {
+		window.location.reload();
+	};
+
+	const handleCopy = () => {
+		const textarea = document.createElement("textarea");
+		textarea.value = message;
+		document.body.appendChild(textarea);
+		textarea.select();
+		document.execCommand("copy");
+		document.body.removeChild(textarea);
+		setIsCopy(true);
+
+		setTimeout(() => {
+			setIsCopy(false);
+		}, 1000);
+	};
 
 	const lastFive = getLastFiveDaysOfCurrentMonth();
+
+	const toTitleCase = (str: string) =>
+		str
+			.toLowerCase()
+			.split(" ")
+			.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+			.join(" ");
 
 	return (
 		<div className="flex min-h-screen items-center justify-center m-4">
@@ -157,12 +177,13 @@ function App() {
 									placeholder="Masukkan nama santri"
 									autoComplete="off"
 									name="namaSantri"
+									className="capitalize"
 									value={form.namaSantri}
 									onChange={handleChange}
 									required
 								/>
 							</div>
-							<div className="flex flex-col space-y-1.5">
+							{/* <div className="flex flex-col space-y-1.5">
 								<Label htmlFor="name">Nomor Whatsapp</Label>
 								<Input
 									id="name"
@@ -187,7 +208,7 @@ function App() {
 									maxLength={13}
 									required
 								/>
-							</div>
+							</div> */}
 							<div className="flex flex-col space-y-1.5">
 								<Label htmlFor="framework">
 									Jumlah tunggakan
@@ -217,7 +238,7 @@ function App() {
 
 							<div className="flex flex-col space-y-1.5">
 								<Label htmlFor="framework">
-									Bulan Tunggakan
+									Bulan tunggakan
 								</Label>
 								<div className="grid grid-flow-col grid-rows-4">
 									{months.map((month) => (
@@ -275,10 +296,9 @@ function App() {
 											tglTerakhirLunas: val,
 										})
 									}
-									defaultValue={form.tglTerakhirLunas}
 								>
 									<SelectTrigger className="w-full">
-										<SelectValue placeholder="Pilih tanggal" />
+										<SelectValue placeholder="Pilih tanggal"/>
 									</SelectTrigger>
 									<SelectContent className="bg-lime-100">
 										{lastFive.map((item) => (
@@ -301,7 +321,7 @@ function App() {
 							type="reset"
 							variant="outline"
 							className="mt-5 w-full"
-              onClick={handleReset}
+							onClick={handleReset}
 						>
 							Reset Form
 						</Button>
@@ -315,16 +335,16 @@ function App() {
 								<CardDescription className="text-gray-500 text-xs">
 									<p>
 										Nama Santri :{" "}
-										<span className="ml-2 font-semibold">
+										<span className="ml-2 font-semibold capitalize">
 											{form.namaSantri}
 										</span>
 									</p>
-									<p>
+									{/* <p>
 										No whatsapp :
 										<span className="ml-2 font-semibold">
 											{form.noWa}
 										</span>
-									</p>
+									</p> */}
 								</CardDescription>
 								<Button
 									className=" mt-5 w-full bg-black text-white"
@@ -332,6 +352,13 @@ function App() {
 									onClick={handleKirim}
 								>
 									Krim
+								</Button>
+								<Button
+									className=" mt-2 w-full"
+									variant="outline"
+									onClick={handleCopy}
+								>
+									{isCopy ? "Copied" : "Copy"}
 								</Button>
 							</CardHeader>
 							<CardContent>
